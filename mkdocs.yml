@@ -1,0 +1,9 @@
+site_name: LLM Eval Lab
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - Learning Roadmap: learning-roadmap.md
+  - DeepEval: deepeval.md
+  - Ragas: ragas.md
+

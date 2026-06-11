@@ -1,0 +1,66 @@
+[project]
+name = "llm-eval-lab"
+version = "0.1.0"
+description = "A hands-on learning project for DeepEval and Ragas concepts."
+authors = [
+    { name = "Pramila Janrao" }
+]
+readme = "README.md"
+requires-python = ">=3.10,<4.0"
+dependencies = [
+    "deepeval>=4.0.6,<5.0.0",
+    "ragas>=0.4.3,<0.5.0",
+    "datasets>=4.0.0,<5.0.0",
+    "openai>=2.0.0,<3.0.0",
+    "pandas>=2.2.0,<3.0.0",
+    "pydantic>=2.10.0,<3.0.0",
+    "python-dotenv>=1.0.1,<2.0.0",
+    "rich>=14.0.0,<15.0.0",
+    "typer>=0.16.0,<1.0.0",
+]
+
+[project.scripts]
+llm-eval-lab = "llm_eval_lab.cli:app"
+
+[tool.poetry]
+packages = [{ include = "llm_eval_lab", from = "src" }]
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.16.0"
+pre-commit = "^4.2.0"
+pytest = "^8.4.0"
+pytest-cov = "^6.2.0"
+pytest-asyncio = "^1.0.0"
+ruff = "^0.11.13"
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.6.1"
+mkdocs-material = "^9.6.14"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+addopts = "-q --strict-markers --cov=llm_eval_lab --cov-report=term-missing"
+pythonpath = ["src"]
+testpaths = ["tests"]
+markers = [
+    "llm: requires an LLM provider API key",
+]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests", "evals", "examples"]
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+ignore = ["UP006", "UP007"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+mypy_path = "src"
+packages = ["llm_eval_lab"]
+ignore_missing_imports = true
