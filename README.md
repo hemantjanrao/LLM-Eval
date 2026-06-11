@@ -56,10 +56,28 @@ poetry run mkdocs serve
 - `evals/deepeval/test_rag_deepeval.py`: DeepEval test file you can run with `deepeval test run`.
 - `docs/`: concept notes and learning path.
 
+## Documentation
+
+Full docs live in `docs/`. Serve them locally with:
+
+```bash
+poetry run mkdocs serve
+```
+
+| Doc | Topic |
+|-----|-------|
+| `docs/getting-started.md` | Install and first commands |
+| `docs/concepts.md` | RAG evaluation metrics explained |
+| `docs/architecture.md` | How modules connect |
+| `docs/learning-roadmap.md` | Step-by-step learning path |
+| `docs/deepeval.md` | DeepEval framework notes |
+| `docs/ragas.md` | Ragas framework notes |
+
 ## Recommended Learning Path
 
 1. Run `poetry run llm-eval-lab ask "What is Ragas?"`.
 2. Read `src/llm_eval_lab/toy_rag.py` to understand the app being evaluated.
 3. Run `poetry run llm-eval-lab score-local` and inspect metric explanations.
-4. Read `docs/deepeval.md`, then run the DeepEval smoke command with an API key.
-5. Read `docs/ragas.md`, then run the Ragas smoke command with an API key.
+4. Read `docs/concepts.md` and `docs/architecture.md`.
+5. Read `docs/deepeval.md`, then run the DeepEval smoke command with an API key.
+6. Read `docs/ragas.md`, then run the Ragas smoke command with an API key.

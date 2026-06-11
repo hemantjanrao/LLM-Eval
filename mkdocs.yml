@@ -3,6 +3,9 @@ theme:
   name: material
 nav:
   - Home: index.md
+  - Getting Started: getting-started.md
+  - Concepts: concepts.md
+  - Architecture: architecture.md
   - Learning Roadmap: learning-roadmap.md
   - DeepEval: deepeval.md
   - Ragas: ragas.md
