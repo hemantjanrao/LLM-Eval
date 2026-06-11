@@ -121,15 +121,31 @@ class FaithfulnessHeuristicMetric:
         )
 
 
+def build_local_metrics(thresholds: dict[str, float] | None = None) -> list[LocalMetric]:
+    """Create local metrics using optional per-metric threshold overrides."""
+
+    resolved = thresholds or {}
+    return [
+        KeywordRecallMetric(threshold=resolved.get("keyword_recall", 0.55)),
+        ContextPrecisionMetric(threshold=resolved.get("context_precision", 0.5)),
+        FaithfulnessHeuristicMetric(threshold=resolved.get("faithfulness_heuristic", 0.45)),
+    ]
+
+
+def score_record_with_thresholds(
+    record: EvaluationRunRecord,
+    thresholds: dict[str, float] | None = None,
+) -> list[MetricResult]:
+    """Run local metrics with configurable thresholds."""
+
+    metrics = build_local_metrics(thresholds)
+    return [metric.score(record) for metric in metrics]
+
+
 def score_record(record: EvaluationRunRecord) -> list[MetricResult]:
     """Run the default local metrics for one evaluation record."""
 
-    metrics: list[LocalMetric] = [
-        KeywordRecallMetric(),
-        ContextPrecisionMetric(),
-        FaithfulnessHeuristicMetric(),
-    ]
-    return [metric.score(record) for metric in metrics]
+    return score_record_with_thresholds(record)
 
 
 def _content_terms(text: str) -> list[str]:

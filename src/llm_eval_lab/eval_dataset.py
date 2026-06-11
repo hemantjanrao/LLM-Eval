@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 from pydantic import BaseModel, Field
+
+from llm_eval_lab.config import repo_root
 
 
 class EvaluationExample(BaseModel):
@@ -41,53 +46,29 @@ class EvaluationRunRecord(BaseModel):
         return self.example.question
 
 
-def load_examples() -> list[EvaluationExample]:
-    """Return a compact dataset that covers retrieval, generation, and safety basics."""
+DEFAULT_DATASET_PATH = repo_root() / "datasets" / "default.jsonl"
 
-    return [
-        EvaluationExample(
-            question="What is DeepEval useful for?",
-            reference_answer=(
-                "DeepEval is useful for testing LLM applications with metrics such as "
-                "answer relevancy, faithfulness, contextual metrics, and custom G-Eval rubrics."
-            ),
-            reference_contexts=[
-                "DeepEval is an LLM evaluation framework that works like pytest for LLM apps.",
-                (
-                    "DeepEval includes answer relevancy, faithfulness, contextual RAG "
-                    "metrics, and G-Eval."
-                ),
-            ],
-            tags=["deepeval", "framework"],
-        ),
-        EvaluationExample(
-            question="What does faithfulness measure in RAG evaluation?",
-            reference_answer=(
-                "Faithfulness measures whether the generated answer is supported by the "
-                "retrieved context instead of inventing unsupported claims."
-            ),
-            reference_contexts=[
-                (
-                    "Faithfulness evaluates whether a response is factually grounded in "
-                    "retrieved context."
-                ),
-                (
-                    "A faithful RAG answer should only make claims supported by the "
-                    "retrieved evidence."
-                ),
-            ],
-            tags=["rag", "metric"],
-        ),
-        EvaluationExample(
-            question="How is Ragas different from a vibe check?",
-            reference_answer=(
-                "Ragas helps replace subjective vibe checks with repeatable evaluation datasets, "
-                "metrics, and feedback loops for LLM applications."
-            ),
-            reference_contexts=[
-                "Ragas helps teams move from vibe checks to systematic evaluation loops.",
-                "Ragas provides metrics and test generation for LLM and RAG applications.",
-            ],
-            tags=["ragas", "framework"],
-        ),
-    ]
+
+def load_examples_from_file(path: Path) -> list[EvaluationExample]:
+    """Load evaluation examples from a JSONL file."""
+
+    examples: list[EvaluationExample] = []
+    for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        stripped = line.strip()
+        if not stripped:
+            continue
+        payload = json.loads(stripped)
+        try:
+            examples.append(EvaluationExample.model_validate(payload))
+        except Exception as error:
+            raise ValueError(f"Invalid example on line {line_number} of {path}") from error
+    if not examples:
+        raise ValueError(f"No evaluation examples found in {path}")
+    return examples
+
+
+def load_examples(path: Path | None = None) -> list[EvaluationExample]:
+    """Return the default evaluation dataset from JSONL."""
+
+    dataset_path = path or DEFAULT_DATASET_PATH
+    return load_examples_from_file(dataset_path)

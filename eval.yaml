@@ -1,0 +1,20 @@
+dataset: datasets/default.jsonl
+tags: []
+metrics:
+  local:
+    enabled: true
+    thresholds:
+      keyword_recall: 0.55
+      context_precision: 0.5
+      faithfulness_heuristic: 0.45
+  deepeval:
+    enabled: false
+    threshold: 0.5
+    model: gpt-4o-mini
+  ragas:
+    enabled: false
+    model: gpt-4o-mini
+    embedding_model: text-embedding-3-small
+artifacts_dir: artifacts/evals
+regression:
+  max_mean_score_drop: 0.05
