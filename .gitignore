@@ -11,4 +11,5 @@ dist/
 build/
 site/
 *.egg-info/
+artifacts/evals/
 

@@ -13,8 +13,11 @@ This project demonstrates:
 ## Run
 
 ```bash
+poetry run llm-eval-lab deepeval-smoke
 poetry run deepeval test run evals/deepeval/test_rag_deepeval.py
 ```
+
+Smoke and test commands load examples from `datasets/default.jsonl` via `EvalRunner`. DeepEval is not yet wired into `run-eval` — enable it explicitly in your own scripts or pytest files. See [Production Eval](production-eval.md) for the config-driven workflow.
 
 You need an LLM provider key such as `OPENAI_API_KEY` for most LLM-as-judge metrics.
 

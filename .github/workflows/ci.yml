@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: poetry install --with dev
+
+      - name: Ruff
+        run: poetry run ruff check .
+
+      - name: Mypy
+        run: poetry run mypy
+
+      - name: Pytest
+        run: poetry run pytest
+
+      - name: Regression gate
+        run: |
+          REPORT=$(poetry run python -c "
+          from pathlib import Path
+          from llm_eval_lab.runner import run_default_eval
+          from llm_eval_lab.reporting import write_report_json
+          report = run_default_eval()
+          path = Path('artifacts/ci-report.json')
+          write_report_json(report, path)
+          print(path)
+          ")
+          poetry run llm-eval-lab compare-baseline "$REPORT"

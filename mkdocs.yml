@@ -1,12 +1,27 @@
 site_name: LLM Eval Lab
 theme:
   name: material
+  features:
+    - content.code.copy
 nav:
   - Home: index.md
+  - QA Onboarding: qa-onboarding.md
   - Getting Started: getting-started.md
   - Concepts: concepts.md
   - Architecture: architecture.md
+  - Production Eval: production-eval.md
   - Learning Roadmap: learning-roadmap.md
   - DeepEval: deepeval.md
   - Ragas: ragas.md
 
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - tables
+  - toc:
+      permalink: true

@@ -21,7 +21,7 @@ Follow these levels in order. Each level builds on the previous one.
 
 **Goal:** Understand the gold standard.
 
-Read `src/llm_eval_lab/eval_dataset.py`.
+Read `src/llm_eval_lab/eval_dataset.py` and `datasets/default.jsonl`.
 
 Each `EvaluationExample` contains:
 
@@ -37,7 +37,7 @@ Run:
 poetry run llm-eval-lab inspect-dataset
 ```
 
-**Checkpoint:** You can describe what an `EvaluationRunRecord` adds on top of an `EvaluationExample`.
+**Checkpoint:** You can describe what an `EvaluationRunRecord` adds on top of an `EvaluationExample`, and where examples are loaded from (JSONL, not hardcoded Python).
 
 ## Level 3: Local Metrics (No API Key)
 
@@ -46,6 +46,8 @@ poetry run llm-eval-lab inspect-dataset
 Run:
 ```bash
 poetry run llm-eval-lab score-local
+# or the full suite entry point:
+poetry run llm-eval-lab run-eval
 ```
 
 Read `src/llm_eval_lab/local_metrics.py`:
@@ -58,7 +60,7 @@ Read `src/llm_eval_lab/local_metrics.py`:
 
 Notice the faithfulness example: answer quality passes but `context_precision` fails. That means retrieval ranking needs work, not generation.
 
-Run `poetry run pytest` — all tests pass without an API key.
+Run `poetry run pytest` — all 19 tests pass without an API key, including golden score assertions.
 
 **Checkpoint:** You can read a metric table and diagnose whether retrieval or generation is the problem.
 
@@ -105,31 +107,51 @@ Key concepts:
 
 **Checkpoint:** You can explain when to use DeepEval (test assertions) vs Ragas (dataset loops).
 
-## Level 6: CI and Production Patterns
+## Level 6: Production Eval and CI
 
-**Goal:** Make evals part of your workflow.
+**Goal:** Make evals part of your workflow with config, artifacts, and regression gates.
 
-| When | What to run |
-|------|-------------|
-| Every commit | `pytest` (local metrics, toy RAG) |
-| PR touching prompts/retrieval | DeepEval or Ragas with API key |
-| Scheduled / pre-release | Full dataset evaluation with LLM metrics |
+Read [Production Eval](production-eval.md) and `eval.yaml`.
+
+Run:
+```bash
+poetry run llm-eval-lab run-eval --format both
+poetry run llm-eval-lab compare-baseline artifacts/baseline.json
+```
+
+| When | What to run | API key? |
+|------|-------------|----------|
+| Every commit / PR | `pytest` + regression gate (CI) | No |
+| After app changes | `run-eval --format both` | No |
+| PR touching prompts/retrieval | DeepEval or Ragas locally | Yes |
+| Scheduled / pre-release | Full LLM dataset evaluation | Yes |
+
+Key modules:
+
+| Module | Role |
+|--------|------|
+| `runner.py` | `EvalRunner`, `EvaluableApp` protocol |
+| `config.py` | Load `eval.yaml` |
+| `reporting.py` | `EvalReport` artifacts |
+| `regression.py` | Baseline comparison |
 
 Patterns from this repo:
 
-- Skip LLM tests when `OPENAI_API_KEY` is missing (`evals/deepeval/test_rag_deepeval.py`)
-- Keep framework adapters thin — data model stays in `eval_dataset.py`
-- Use smoke commands to verify wiring before full eval runs
+- Local metrics and golden tests run in CI without secrets
+- LLM tests skip when `OPENAI_API_KEY` is missing (`evals/deepeval/test_rag_deepeval.py`)
+- Committed baseline at `artifacts/baseline.json` gates score regressions
+- Framework adapters stay thin — data model stays in `eval_dataset.py`
 
-**Checkpoint:** You have a plan for which metrics run where in your pipeline.
+**Checkpoint:** You can explain what `run-eval`, `compare-baseline`, and the CI workflow do.
 
 ## Level 7: Evaluate Your Own App
 
 Replace the toy pipeline:
 
-1. Implement your RAG app's `run_example()` to return `EvaluationRunRecord`
-2. Add real examples to `load_examples()` or load from a file
-3. Start with local metrics, then add DeepEval/Ragas
-4. Tune thresholds based on your domain
+1. Implement `EvaluableApp.run_example()` to return `EvaluationRunRecord`
+2. Add examples to `datasets/default.jsonl` or point `eval.yaml` at your own file
+3. Start with `run-eval` (local metrics), then add DeepEval/Ragas
+4. Tune thresholds in `eval.yaml` based on your domain
+5. Update `artifacts/baseline.json` after intentional improvements
 
-See [Architecture](architecture.md) for extension points.
+See [Production Eval](production-eval.md) and [Architecture](architecture.md) for extension points.

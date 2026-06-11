@@ -84,9 +84,24 @@ Does the output avoid harmful content?
 
 **Recommended workflow:**
 
-1. Start with local metrics to understand failures.
-2. Add LLM-as-judge metrics for semantic quality.
-3. Run deterministic tests on every commit; run LLM evals on schedule or before release.
+1. Start with local metrics to understand failures (`run-eval` or `score-local`).
+2. Add LLM-as-judge metrics for semantic quality (DeepEval / Ragas smoke commands).
+3. Run deterministic tests and regression gates on every commit; run LLM evals on schedule or before release.
+
+See [Production Eval](production-eval.md) for the full CI and artifact workflow.
+
+## Structured Reports
+
+Beyond per-metric `MetricResult` objects, the runner produces an `EvalReport` with:
+
+| Field | Meaning |
+|-------|---------|
+| `scores` | All `RecordScore` entries (question, metric, score, passed, reason) |
+| `summary.pass_rate` | Fraction of metric checks that passed |
+| `summary.mean_scores` | Average score per metric across examples |
+| `summary.failed_questions` | Questions with at least one failing metric |
+
+Use `poetry run llm-eval-lab run-eval --format both` to write JSON artifacts, then `compare-baseline` to gate regressions against `artifacts/baseline.json`.
 
 ## Reading Scores
 

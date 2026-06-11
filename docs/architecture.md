@@ -65,7 +65,12 @@ Key methods:
 | `EvaluationExample` | Input + gold answer + gold contexts + tags |
 | `EvaluationRunRecord` | Example + actual answer + retrieved contexts |
 
-`load_examples()` returns three scenarios covering DeepEval, faithfulness, and Ragas.
+| Function | Role |
+|----------|------|
+| `load_examples_from_file(path)` | Load examples from a JSONL file |
+| `load_examples()` | Load the default dataset from `datasets/default.jsonl` |
+
+The default dataset contains three scenarios covering DeepEval, faithfulness, and Ragas. Edit `datasets/default.jsonl` to add examples; point `eval.yaml` at a different file if needed.
 
 ### `local_metrics.py` — Deterministic Scoring
 
@@ -76,6 +81,8 @@ Key methods:
 | `FaithfulnessHeuristicMetric` | Answer grounding in retrieved text |
 
 `score_record(record)` runs all three and returns `MetricResult` objects with name, score, passed, and reason.
+
+`score_record_with_thresholds(record, thresholds)` accepts per-metric threshold overrides from `eval.yaml`.
 
 ### `deepeval_concepts.py` — DeepEval Adapter
 
@@ -130,24 +137,74 @@ Async helpers: `score_record_with_ragas()`, `evaluate_records_with_ragas()`.
 | `ask` | Query the toy RAG app |
 | `inspect-dataset` | Show all evaluation records |
 | `score-local` | Run deterministic metrics |
+| `run-eval` | Full suite with optional JSON artifacts |
+| `compare-baseline` | Regression gate vs committed baseline |
 | `deepeval-smoke` | One DeepEval assertion (needs API key) |
 | `ragas-smoke` | One Ragas metric (needs API key) |
 
-`ConsoleReporter` separates presentation from scoring so you could swap in JSON output later.
+`ConsoleReporter` and `JsonReporter` separate presentation from scoring.
+
+### `runner.py` — Eval Orchestration
+
+| Component | Role |
+|-----------|------|
+| `EvaluableApp` | Protocol for pluggable apps under test |
+| `EvalRunner` | Loads config/dataset, runs examples, scores with enabled backends |
+| `filter_examples_by_tags()` | Tag-based example filtering |
+
+### `config.py` — YAML Configuration
+
+Loads `eval.yaml` for dataset path, metric thresholds, artifacts directory, and regression settings.
+
+### `reporting.py` — Structured Reports
+
+| Model | Role |
+|-------|------|
+| `RecordScore` | One metric score for one example |
+| `EvalRunSummary` | Pass rate and mean scores |
+| `EvalReport` | Full run artifact (JSON + markdown summary) |
+
+### `regression.py` — Baseline Gates
+
+`compare_reports()` detects mean score drops and pass-to-fail flips against `artifacts/baseline.json`.
+
+## Production Flow
+
+```mermaid
+flowchart TB
+    CFG[eval.yaml]
+    DS[datasets/default.jsonl]
+    APP[EvaluableApp]
+    RUN[EvalRunner]
+    RPT[EvalReport JSON]
+    GATE[compare_reports]
+
+    CFG --> RUN
+    DS --> RUN
+    APP --> RUN
+    RUN --> RPT --> GATE
+```
 
 ## Test Layout
 
 ```
 tests/                          # API-free unit tests (run in CI)
+  test_runner.py                # EvalRunner, golden mean scores, tag filtering
+  test_regression.py            # Baseline comparison
+  test_config.py                # eval.yaml loading
+  test_local_metrics.py         # Per-example golden scores
 evals/deepeval/                 # DeepEval test file (needs API key)
 examples/                       # Standalone demo scripts
+.github/workflows/ci.yml        # ruff, mypy, pytest, regression gate
+artifacts/baseline.json          # Committed known-good EvalReport
 ```
 
 ## Extension Points
 
 To evaluate your own RAG app:
 
-1. Replace `ToyRagPipeline` with your app, but keep returning `EvaluationRunRecord`.
-2. Add examples to `load_examples()` or load from JSON/CSV.
+1. Implement `EvaluableApp` (see `docs/production-eval.md`) and pass it to `EvalRunner().run(app=...)`.
+2. Add examples to `datasets/default.jsonl` or point `eval.yaml` at your own JSONL file.
 3. Reuse `score_record()`, `assert_record_with_deepeval()`, or `evaluate_records_with_ragas()`.
 4. Add local metrics in `local_metrics.py` for fast regression checks.
+5. Run `poetry run llm-eval-lab run-eval --format both` and gate with `compare-baseline`.

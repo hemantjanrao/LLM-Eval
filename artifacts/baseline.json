@@ -1,0 +1,152 @@
+{
+  "run_id": "59a8a172-f39c-4997-857a-47c342369ed1",
+  "timestamp": "2026-06-11T19:54:36.382532+00:00",
+  "git_sha": "f9d55d27a2cc26cf713245a58791b212730a4670",
+  "config_hash": "10f05ad5c88a",
+  "records": [
+    {
+      "example": {
+        "question": "What is DeepEval useful for?",
+        "reference_answer": "DeepEval is useful for testing LLM applications with metrics such as answer relevancy, faithfulness, contextual metrics, and custom G-Eval rubrics.",
+        "reference_contexts": [
+          "DeepEval is an LLM evaluation framework that works like pytest for LLM apps.",
+          "DeepEval includes answer relevancy, faithfulness, contextual RAG metrics, and G-Eval."
+        ],
+        "tags": [
+          "deepeval",
+          "framework"
+        ]
+      },
+      "actual_answer": "DeepEval is useful for testing LLM apps with pytest-like workflows, RAG metrics, safety metrics, and custom G-Eval rubrics.",
+      "retrieved_contexts": [
+        "DeepEval is an LLM evaluation framework that works like pytest for LLM apps and supports answer relevancy, faithfulness, contextual metrics, safety metrics, and custom G-Eval rubrics.",
+        "Ragas helps teams move from vibe checks to systematic evaluation loops with datasets, metrics, and feedback for LLM applications."
+      ]
+    },
+    {
+      "example": {
+        "question": "What does faithfulness measure in RAG evaluation?",
+        "reference_answer": "Faithfulness measures whether the generated answer is supported by the retrieved context instead of inventing unsupported claims.",
+        "reference_contexts": [
+          "Faithfulness evaluates whether a response is factually grounded in retrieved context.",
+          "A faithful RAG answer should only make claims supported by the retrieved evidence."
+        ],
+        "tags": [
+          "rag",
+          "metric"
+        ]
+      },
+      "actual_answer": "Faithfulness measures whether an answer is grounded in the retrieved context and avoids unsupported claims.",
+      "retrieved_contexts": [
+        "DeepEval is an LLM evaluation framework that works like pytest for LLM apps and supports answer relevancy, faithfulness, contextual metrics, safety metrics, and custom G-Eval rubrics.",
+        "Faithfulness evaluates whether a generated answer is grounded in retrieved context and avoids unsupported claims."
+      ]
+    },
+    {
+      "example": {
+        "question": "How is Ragas different from a vibe check?",
+        "reference_answer": "Ragas helps replace subjective vibe checks with repeatable evaluation datasets, metrics, and feedback loops for LLM applications.",
+        "reference_contexts": [
+          "Ragas helps teams move from vibe checks to systematic evaluation loops.",
+          "Ragas provides metrics and test generation for LLM and RAG applications."
+        ],
+        "tags": [
+          "ragas",
+          "framework"
+        ]
+      },
+      "actual_answer": "Ragas turns subjective vibe checks into repeatable evaluation loops with datasets, metrics, and feedback for LLM applications.",
+      "retrieved_contexts": [
+        "Ragas helps teams move from vibe checks to systematic evaluation loops with datasets, metrics, and feedback for LLM applications.",
+        "DeepEval is an LLM evaluation framework that works like pytest for LLM apps and supports answer relevancy, faithfulness, contextual metrics, safety metrics, and custom G-Eval rubrics."
+      ]
+    }
+  ],
+  "scores": [
+    {
+      "question": "What is DeepEval useful for?",
+      "metric": "keyword_recall",
+      "score": 0.571,
+      "passed": true,
+      "reason": "Measures how many reference answer terms appear in the generated answer.",
+      "backend": "local"
+    },
+    {
+      "question": "What is DeepEval useful for?",
+      "metric": "context_precision",
+      "score": 0.502,
+      "passed": true,
+      "reason": "Measures whether retrieved chunks overlap with expected supporting evidence.",
+      "backend": "local"
+    },
+    {
+      "question": "What is DeepEval useful for?",
+      "metric": "faithfulness_heuristic",
+      "score": 0.714,
+      "passed": true,
+      "reason": "Measures whether important answer terms are present in retrieved context.",
+      "backend": "local"
+    },
+    {
+      "question": "What does faithfulness measure in RAG evaluation?",
+      "metric": "keyword_recall",
+      "score": 0.667,
+      "passed": true,
+      "reason": "Measures how many reference answer terms appear in the generated answer.",
+      "backend": "local"
+    },
+    {
+      "question": "What does faithfulness measure in RAG evaluation?",
+      "metric": "context_precision",
+      "score": 0.416,
+      "passed": false,
+      "reason": "Measures whether retrieved chunks overlap with expected supporting evidence.",
+      "backend": "local"
+    },
+    {
+      "question": "What does faithfulness measure in RAG evaluation?",
+      "metric": "faithfulness_heuristic",
+      "score": 0.9,
+      "passed": true,
+      "reason": "Measures whether important answer terms are present in retrieved context.",
+      "backend": "local"
+    },
+    {
+      "question": "How is Ragas different from a vibe check?",
+      "metric": "keyword_recall",
+      "score": 0.857,
+      "passed": true,
+      "reason": "Measures how many reference answer terms appear in the generated answer.",
+      "backend": "local"
+    },
+    {
+      "question": "How is Ragas different from a vibe check?",
+      "metric": "context_precision",
+      "score": 0.508,
+      "passed": true,
+      "reason": "Measures whether retrieved chunks overlap with expected supporting evidence.",
+      "backend": "local"
+    },
+    {
+      "question": "How is Ragas different from a vibe check?",
+      "metric": "faithfulness_heuristic",
+      "score": 0.714,
+      "passed": true,
+      "reason": "Measures whether important answer terms are present in retrieved context.",
+      "backend": "local"
+    }
+  ],
+  "summary": {
+    "total_examples": 3,
+    "total_scores": 9,
+    "pass_rate": 0.889,
+    "mean_scores": {
+      "keyword_recall": 0.698,
+      "context_precision": 0.475,
+      "faithfulness_heuristic": 0.776
+    },
+    "failed_questions": [
+      "What does faithfulness measure in RAG evaluation?"
+    ]
+  }
+}

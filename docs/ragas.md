@@ -13,7 +13,10 @@ This project demonstrates:
 
 ```bash
 poetry run llm-eval-lab ragas-smoke
+python examples/run_ragas_one_case.py
 ```
+
+Smoke commands load the default dataset via `EvalRunner`. Ragas is not yet wired into `run-eval` — use `ragas_concepts.py` adapters directly for dataset evaluation. See [Production Eval](production-eval.md) for the config-driven workflow.
 
 You need an LLM provider key such as `OPENAI_API_KEY` for metrics that call an evaluator model.
 
